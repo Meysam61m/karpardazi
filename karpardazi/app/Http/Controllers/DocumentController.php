@@ -54,6 +54,11 @@ class DocumentController extends Controller
 
     public function create()
     {
+        $user = auth()->user();
+        if ($user->isKarpardaz() && (! $user->tankhah_charged_on || (int) $user->tankhah_amount <= 0)) {
+            return redirect()->route('tankhah.edit')->with('error', 'برای ثبت سند، ابتدا مبلغ و تاریخ آخرین واریز تنخواه را در اطلاعات تنخواه ثبت کنید.');
+        }
+
         return view('documents.create', [
             'branches' => auth()->user()->isAdmin() ? Branch::orderBy('id')->get() : auth()->user()->branches()->get(),
             'defaultBranch' => auth()->user()->isAdmin() ? Branch::default() : auth()->user()->branches()->first(),
@@ -64,7 +69,11 @@ class DocumentController extends Controller
     public function store(StoreDocumentRequest $request, DocumentNumberGenerator $numbers)
     {
         $data = $request->validated();
-        abort_unless($request->user()->canAccessBranch((int) $data['branch_id']), 403);
+        $user = $request->user();
+        abort_unless($user->canAccessBranch((int) $data['branch_id']), 403);
+        if ($user->isKarpardaz() && (! $user->tankhah_charged_on || (int) $user->tankhah_amount <= 0)) {
+            return redirect()->route('tankhah.edit')->with('error', 'ثبت سند ممکن نیست؛ مبلغ و تاریخ آخرین واریز تنخواه را ثبت کنید.');
+        }
 
         $document = DB::transaction(function () use ($data, $request) {
             $document = ExpenseDocument::create([

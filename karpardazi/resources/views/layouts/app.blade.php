@@ -39,6 +39,7 @@
                 @endif
             </ul>
             <span class="navbar-text text-white-50 small ms-3">{{ auth()->user()->name }}</span>
+            <button type="button" class="btn btn-outline-light btn-sm ms-2" onclick="if (window.history.length > 1) { window.history.back(); } else { window.location.href='{{ route('dashboard') }}'; }" aria-label="بازگشت به صفحه قبل">بازگشت</button>
             <form method="post" action="{{ route('logout') }}" class="m-0">
                 @csrf
                 <button class="btn btn-outline-light btn-sm" type="submit">خروج</button>
