@@ -38,6 +38,6 @@ Route::middleware('auth')->group(function () {
         Route::get('audit-logs', [Admin\AuditLogController::class, 'index'])->name('audit.index');
 
         Route::get('backup', [Admin\BackupController::class, 'index'])->name('backup.index');
-        Route::get('backup/download', [Admin\BackupController::class, 'download'])->name('backup.download');
+        Route::post('backup/download', [Admin\BackupController::class, 'download'])->name('backup.download');
     });
 });
