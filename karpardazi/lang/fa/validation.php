@@ -1,0 +1,35 @@
+<?php
+
+return [
+    'required' => 'وارد کردن :attribute الزامی است.',
+    'required_if' => 'وارد کردن :attribute الزامی است.',
+    'string' => ':attribute باید متن باشد.',
+    'integer' => ':attribute باید عدد صحیح باشد.',
+    'numeric' => ':attribute باید عدد باشد.',
+    'min' => ['numeric' => ':attribute نباید کمتر از :min باشد.', 'string' => ':attribute نباید کوتاه‌تر از :min کاراکتر باشد.', 'array' => ':attribute نباید کمتر از :min مورد داشته باشد.'],
+    'max' => ['numeric' => ':attribute نباید بیشتر از :max باشد.', 'string' => ':attribute نباید بیشتر از :max کاراکتر باشد.', 'array' => ':attribute نباید بیشتر از :max مورد داشته باشد.'],
+    'unique' => 'این :attribute قبلاً ثبت شده است.',
+    'exists' => ':attribute انتخاب‌شده معتبر نیست.',
+    'in' => ':attribute انتخاب‌شده معتبر نیست.',
+    'confirmed' => 'تکرار :attribute با مقدار آن یکسان نیست.',
+    'date' => ':attribute یک تاریخ معتبر نیست.',
+    'boolean' => ':attribute معتبر نیست.',
+    'array' => ':attribute معتبر نیست.',
+    'file' => ':attribute باید یک فایل باشد.',
+    'mimes' => 'قالب فایل :attribute معتبر نیست.',
+    'regex' => 'قالب :attribute معتبر نیست.',
+
+    'attributes' => [
+        'username' => 'نام کاربری',
+        'password' => 'رمز عبور',
+        'name' => 'نام',
+        'role' => 'نقش',
+        'branch_id' => 'شعبه',
+        'document_date' => 'تاریخ سند',
+        'karpardaz_name' => 'نام کارپرداز',
+        'attachments_pages' => 'تعداد برگ مدارک',
+        'description' => 'توضیحات',
+        'items' => 'اقلام سند',
+        'dump' => 'فایل پشتیبان',
+    ],
+];

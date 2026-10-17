@@ -1,0 +1,41 @@
+@font-face {
+    font-family: 'Vazirmatn';
+    src: url('../vendor/vazirmatn/Vazirmatn.woff2') format('woff2');
+    font-weight: 100 900;
+    font-display: swap;
+}
+
+body {
+    font-family: 'Vazirmatn', Tahoma, sans-serif;
+    background-color: #f4f6f9;
+}
+
+nav.navbar, .navbar-brand, .nav-link, .dropdown-item, .navbar-text, button, input, select, textarea, .btn {
+    font-family: 'Vazirmatn', Tahoma, sans-serif;
+}
+
+.kpi-card {
+    border: 0;
+    border-radius: .75rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+}
+.kpi-card .kpi-value { font-size: 1.35rem; font-weight: 700; }
+.kpi-card .kpi-label { color: #6c757d; font-size: .85rem; }
+
+.table thead th { white-space: nowrap; background: #eef2f7; }
+.table td, .table th { vertical-align: middle; }
+
+.money-input { direction: ltr; text-align: left; }
+.jdate { direction: ltr; text-align: left; }
+
+.items-table input { font-size: .9rem; }
+.items-table .row-num { width: 3rem; text-align: center; color: #6c757d; }
+
+.badge-draft { background: #ffc107; color: #4d3d00; }
+.badge-final { background: #198754; }
+
+@media print {
+    .no-print, nav.navbar, .alert { display: none !important; }
+    main.container-fluid { padding: 0 !important; }
+    body { background: #fff; }
+}
