@@ -18,6 +18,8 @@ class ExpenseDocument extends Model
         'serial',
         'fiscal_year',
         'document_date',
+        'tankhah_deposit_amount',
+        'tankhah_deposit_date',
         'description',
         'attachments_pages',
         'status',
@@ -31,6 +33,8 @@ class ExpenseDocument extends Model
     {
         return [
             'document_date' => 'date',
+            'tankhah_deposit_amount' => 'integer',
+            'tankhah_deposit_date' => 'date',
             'finalized_at' => 'datetime',
             'attachments_pages' => 'integer',
             'total_amount' => 'integer',

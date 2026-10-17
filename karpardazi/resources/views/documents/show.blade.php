@@ -28,6 +28,8 @@
             <div class="row g-2 small">
                 <div class="col-md-3"><span class="text-muted">تاریخ سند:</span> {{ jdate_fa($document->document_date) }}</div>
                 <div class="col-md-3"><span class="text-muted">کارپرداز:</span> {{ $document->karpardaz_name }}</div>
+                <div class="col-md-3"><span class="text-muted">مبلغ واریز تنخواه:</span> {{ fa_money($document->tankhah_deposit_amount) }} ریال</div>
+                <div class="col-md-3"><span class="text-muted">تاریخ واریز تنخواه:</span> {{ jdate_fa($document->tankhah_deposit_date) }}</div>
                 <div class="col-md-3"><span class="text-muted">ثبت‌کننده:</span> {{ $document->user?->name }}</div>
                 <div class="col-md-3"><span class="text-muted">تعداد برگ مدارک:</span> {{ $document->attachments_pages !== null ? fa($document->attachments_pages) : '—' }}</div>
                 @if($document->isFinal())

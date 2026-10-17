@@ -127,6 +127,14 @@
                     <td class="fw">{{ jdate_fa($document->document_date) }}</td>
                 </tr>
                 <tr>
+                    <td class="lbl">مبلغ واریز تنخواه:</td>
+                    <td class="fw">{{ fa_money($document->tankhah_deposit_amount) }} ریال</td>
+                </tr>
+                <tr>
+                    <td class="lbl">تاریخ واریز تنخواه:</td>
+                    <td class="fw">{{ jdate_fa($document->tankhah_deposit_date) }}</td>
+                </tr>
+                <tr>
                     <td class="lbl">شماره سند:</td>
                     <td>
                         <div class="num-line">

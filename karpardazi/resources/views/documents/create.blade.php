@@ -30,6 +30,14 @@
                         <label class="form-label">تعداد برگ مدارک (اختیاری)</label>
                         <input type="number" name="attachments_pages" class="form-control" value="{{ old('attachments_pages') }}" min="0" max="65535">
                     </div>
+                    <div class="col-md-3">
+                        <label class="form-label">مبلغ واریز تنخواه (ریال) <span class="text-danger">*</span></label>
+                        <input type="text" name="tankhah_deposit_amount" class="form-control money-input" value="{{ old('tankhah_deposit_amount') }}" inputmode="numeric" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">تاریخ واریز تنخواه <span class="text-danger">*</span></label>
+                        <input type="text" name="tankhah_deposit_date" class="form-control jdate" value="{{ old('tankhah_deposit_date') }}" placeholder="1405/07/18" autocomplete="off" required>
+                    </div>
                     <div class="col-12">
                         <label class="form-label">توضیحات</label>
                         <textarea name="description" class="form-control" rows="2" maxlength="2000">{{ old('description') }}</textarea>

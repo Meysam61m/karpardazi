@@ -36,6 +36,8 @@ class KarpardaziTest extends TestCase
         return array_merge([
             'branch_id' => Branch::first()->id,
             'document_date' => '1405/07/20',
+            'tankhah_deposit_amount' => '10,000,000',
+            'tankhah_deposit_date' => '1405/07/01',
             'karpardaz_name' => 'میثم انجیدانی',
             'attachments_pages' => 12,
             'description' => null,
@@ -141,6 +143,16 @@ class KarpardaziTest extends TestCase
             ->assertSessionHasErrors('username');
     }
 
+    public function test_document_requires_a_tankhah_deposit_amount_and_date(): void
+    {
+        $admin = $this->admin();
+        $payload = $this->validPayload();
+        unset($payload['tankhah_deposit_amount'], $payload['tankhah_deposit_date']);
+
+        $this->actingAs($admin)->post('/documents', $payload)
+            ->assertSessionHasErrors(['tankhah_deposit_amount', 'tankhah_deposit_date']);
+    }
+
     public function test_document_number_is_unique_and_searchable(): void
     {
         $admin = $this->admin();
@@ -181,12 +193,11 @@ class KarpardaziTest extends TestCase
         $this->assertNotNull($user->tankhah_charged_on);
     }
 
-    public function test_print_is_blocked_until_tankhah_charge_date_is_set(): void
+    public function test_print_uses_deposit_data_saved_on_the_document(): void
     {
         $kar = User::create([
             'name' => 'کارپرداز سوم', 'username' => 'kar3', 'password' => 'secret123',
             'role' => 'karpardaz', 'is_active' => true,
-            'tankhah_amount' => 5000000, 'tankhah_charged_on' => null,
         ]);
 
         $this->actingAs($kar)->post('/documents', $this->validPayload([
@@ -194,15 +205,12 @@ class KarpardaziTest extends TestCase
             'karpardaz_name' => 'کارپرداز سوم',
         ]));
         $doc = ExpenseDocument::first();
-
-        $this->actingAs($kar)->get("/documents/{$doc->id}/print")
-            ->assertRedirect(route('documents.show', $doc))
-            ->assertSessionHas('error');
-
-        $kar->update(['tankhah_charged_on' => \App\Support\Jalali::toGregorian('1405/07/01')]);
+        $this->assertSame(10000000, $doc->tankhah_deposit_amount);
+        $this->assertNotNull($doc->tankhah_deposit_date);
 
         $this->actingAs($kar)->get("/documents/{$doc->id}/print")
             ->assertOk()
-            ->assertSee('سند هزینه شعبه');
+            ->assertSee('سند هزینه شعبه')
+            ->assertSee('مبلغ واریز تنخواه');
     }
 }

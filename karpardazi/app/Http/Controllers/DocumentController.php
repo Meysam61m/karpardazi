@@ -54,11 +54,6 @@ class DocumentController extends Controller
 
     public function create()
     {
-        $user = auth()->user();
-        if ($user->isKarpardaz() && (! $user->tankhah_charged_on || (int) $user->tankhah_amount <= 0)) {
-            return redirect()->route('tankhah.edit')->with('error', 'برای ثبت سند، ابتدا مبلغ و تاریخ آخرین واریز تنخواه را در اطلاعات تنخواه ثبت کنید.');
-        }
-
         return view('documents.create', [
             'branches' => auth()->user()->isAdmin() ? Branch::orderBy('id')->get() : auth()->user()->branches()->get(),
             'defaultBranch' => auth()->user()->isAdmin() ? Branch::default() : auth()->user()->branches()->first(),
@@ -71,9 +66,6 @@ class DocumentController extends Controller
         $data = $request->validated();
         $user = $request->user();
         abort_unless($user->canAccessBranch((int) $data['branch_id']), 403);
-        if ($user->isKarpardaz() && (! $user->tankhah_charged_on || (int) $user->tankhah_amount <= 0)) {
-            return redirect()->route('tankhah.edit')->with('error', 'ثبت سند ممکن نیست؛ مبلغ و تاریخ آخرین واریز تنخواه را ثبت کنید.');
-        }
 
         $document = DB::transaction(function () use ($data, $request) {
             $document = ExpenseDocument::create([
@@ -81,6 +73,8 @@ class DocumentController extends Controller
                 'user_id' => $request->user()->id,
                 'karpardaz_name' => $data['karpardaz_name'],
                 'document_date' => Jalali::toGregorian($data['document_date']),
+                'tankhah_deposit_amount' => $data['tankhah_deposit_amount'],
+                'tankhah_deposit_date' => Jalali::toGregorian($data['tankhah_deposit_date']),
                 'description' => $data['description'] ?? null,
                 'attachments_pages' => $data['attachments_pages'] ?? null,
                 'status' => ExpenseDocument::STATUS_DRAFT,
@@ -145,6 +139,8 @@ class DocumentController extends Controller
                 'branch_id' => $data['branch_id'],
                 'karpardaz_name' => $data['karpardaz_name'],
                 'document_date' => Jalali::toGregorian($data['document_date']),
+                'tankhah_deposit_amount' => $data['tankhah_deposit_amount'],
+                'tankhah_deposit_date' => Jalali::toGregorian($data['tankhah_deposit_date']),
                 'description' => $data['description'] ?? null,
                 'attachments_pages' => $data['attachments_pages'] ?? null,
             ])->save();
@@ -188,31 +184,13 @@ class DocumentController extends Controller
         abort_unless(auth()->user()->canAccessBranch((int) $document->branch_id), 403);
         $document->load(['items', 'branch', 'user']);
 
-        // قانون: تا تاریخ واریز/شارژ تنخواه کارپرداز ثبت نشده باشد، چاپ سند ممنوع است
-        if ($owner = $this->tankhahOwner($document)) {
-            if ($owner->tankhah_charged_on === null) {
-                return redirect()->route('documents.show', $document)
-                    ->with('error', 'چاپ سند ممکن نیست: تاریخ واریز تنخواه برای «'.$owner->name.'» ثبت نشده است. '
-                        .'ابتدا مدیر از بخش «مدیریت ← کاربران» تاریخ شارژ تنخواه این کاربر را ثبت کند.');
-            }
+        // اطلاعات واریز جزئی از خود سند است؛ سند ناقص قابل چاپ نیست.
+        if (! $document->tankhah_deposit_date || ! $document->tankhah_deposit_amount) {
+            return redirect()->route('documents.show', $document)
+                ->with('error', 'چاپ سند ممکن نیست: مبلغ و تاریخ واریز تنخواه در این سند ثبت نشده است.');
         }
 
         return view('documents.print', compact('document'));
-    }
-
-    /**
-     * کاربر کارپردازی که تنخواه این سند به او مربوط می‌شود:
-     * اگر ثبت‌کننده سند کارپرداز است خودش، وگرنه کاربر کارپردازی با همان نام.
-     */
-    private function tankhahOwner(ExpenseDocument $document): ?\App\Models\User
-    {
-        if ($document->user?->isKarpardaz()) {
-            return $document->user;
-        }
-
-        return \App\Models\User::where('role', \App\Models\User::ROLE_KARPARDAZ)
-            ->where('name', $document->karpardaz_name)
-            ->first();
     }
 
     /** بازنویسی کامل اقلام سند (ردیف‌های خالی نادیده گرفته می‌شوند) */
@@ -252,6 +230,8 @@ class DocumentController extends Controller
             'karpardaz_name' => $document->karpardaz_name,
             'document_number' => $document->document_number,
             'document_date' => jdate($document->document_date),
+            'tankhah_deposit_amount' => $document->tankhah_deposit_amount,
+            'tankhah_deposit_date' => jdate($document->tankhah_deposit_date),
             'description' => $document->description,
             'attachments_pages' => $document->attachments_pages,
             'status' => $document->status,

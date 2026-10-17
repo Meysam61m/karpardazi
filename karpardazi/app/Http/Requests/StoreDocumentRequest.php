@@ -31,7 +31,14 @@ class StoreDocumentRequest extends FormRequest
             ->values()
             ->all();
 
-        $this->merge(['items' => $items]);
+        $depositAmount = Jalali::latinDigits((string) $this->input('tankhah_deposit_amount', ''));
+        $depositAmount = str_replace([',', '٬', ' '], '', $depositAmount);
+
+        $this->merge([
+            'items' => $items,
+            'tankhah_deposit_amount' => $depositAmount,
+            'tankhah_deposit_date' => trim((string) $this->input('tankhah_deposit_date', '')),
+        ]);
     }
 
     public function rules(): array
@@ -39,6 +46,8 @@ class StoreDocumentRequest extends FormRequest
         return [
             'branch_id' => ['required', 'integer', 'exists:branches,id'],
             'document_date' => ['required', 'string', 'max:20'],
+            'tankhah_deposit_amount' => ['required', 'integer', 'min:1', 'max:999999999999999'],
+            'tankhah_deposit_date' => ['required', 'string', 'max:20'],
             'karpardaz_name' => ['required', 'string', 'max:150'],
             'description' => ['nullable', 'string', 'max:2000'],
             'attachments_pages' => ['nullable', 'integer', 'min:0', 'max:65535'],
@@ -55,6 +64,10 @@ class StoreDocumentRequest extends FormRequest
     public function withValidator(Validator $validator): void
     {
         $validator->after(function (Validator $v) {
+            if (! Jalali::isValid($this->input('tankhah_deposit_date'))) {
+                $v->errors()->add('tankhah_deposit_date', 'تاریخ واریز تنخواه معتبر نیست. قالب درست: 1405/07/18');
+            }
+
             if (! Jalali::isValid($this->input('document_date'))) {
                 $v->errors()->add('document_date', 'تاریخ سند معتبر نیست. قالب درست: 1405/07/18');
             }
@@ -92,6 +105,8 @@ class StoreDocumentRequest extends FormRequest
         return [
             'branch_id' => 'شعبه',
             'document_date' => 'تاریخ سند',
+            'tankhah_deposit_amount' => 'مبلغ واریز تنخواه',
+            'tankhah_deposit_date' => 'تاریخ واریز تنخواه',
             'karpardaz_name' => 'نام کارپرداز',
             'description' => 'توضیحات',
             'attachments_pages' => 'تعداد برگ مدارک',
